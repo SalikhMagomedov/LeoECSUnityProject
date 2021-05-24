@@ -15,6 +15,22 @@ internal sealed class Startup : MonoBehaviour {
         // void can be switched to IEnumerator for support coroutines.
             
         _world = new EcsWorld ();
+        
+        for (var i = 0; i < spawnCount; i++)
+        {
+            var entity = _world.NewEntity();
+            var moveRightComponent = new MoveRightComponent {Speed = .1f};
+            
+            var randomPoint = Random.insideUnitCircle * spawnRadius;
+            var t = transform;
+            var spawnedInstance = Instantiate(spawnPrefab,
+                t.position + new Vector3(randomPoint.x, randomPoint.y), Quaternion.identity, t);
+            spawnedInstance.GetComponent<SpriteRenderer>().color = Random.ColorHSV();
+
+            moveRightComponent.Transform = spawnedInstance.transform;
+            entity.Replace(moveRightComponent);
+        }
+        
         _systems = new EcsSystems (_world);
 #if UNITY_EDITOR
         Leopotam.Ecs.UnityIntegration.EcsWorldObserver.Create (_world);
@@ -34,21 +50,6 @@ internal sealed class Startup : MonoBehaviour {
             // .Inject (new CameraService ())
             // .Inject (new NavMeshSupport ())
             .Init ();
-
-        for (var i = 0; i < spawnCount; i++)
-        {
-            var entity = _world.NewEntity();
-            var moveRightComponent = new MoveRightComponent {Speed = .1f};
-            
-            var randomPoint = Random.insideUnitCircle * spawnRadius;
-            var t = transform;
-            var spawnedInstance = Instantiate(spawnPrefab,
-                t.position + new Vector3(randomPoint.x, randomPoint.y), Quaternion.identity, t);
-            spawnedInstance.GetComponent<SpriteRenderer>().color = Random.ColorHSV();
-
-            moveRightComponent.Transform = spawnedInstance.transform;
-            entity.Replace(moveRightComponent);
-        }
     }
 
     private void Update () {
